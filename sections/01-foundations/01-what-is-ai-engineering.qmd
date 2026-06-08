@@ -1,0 +1,305 @@
+---
+title: "Day 1 — What is AI Engineering? The Landscape & Your Roadmap"
+day: 1
+course-section: "01 · Foundations & Setup"
+est-time: "30 min"
+status: draft
+objectives:
+  - "Define AI engineering and distinguish it from ML research and data science"
+  - "Map the modern AI stack from hardware up to applications"
+  - "Reason about the build-vs-buy spectrum: prompting, RAG, fine-tuning, pretraining"
+  - "Estimate the token cost of an LLM feature and pick the cheaper model"
+  - "Orient yourself in the 120-day roadmap ahead"
+prerequisites:
+  - "Basic Python (lists, functions, dictionaries)"
+notebook: notebooks/01-foundations/01-what-is-ai-engineering.ipynb
+---
+
+```{=html}
+<div class="draft-banner">🚧 <strong>Draft</strong> — under human review, content may change.</div>
+```
+
+::: {.tutorial-meta}
+Day 1 · 01 · Foundations & Setup · ⏱️ ~30 min
+:::
+
+::: {.callout-note title="In this tutorial" appearance="simple"}
+**You'll learn to:**
+
+- Define **AI engineering** and place it next to ML research, data science, and software engineering
+- Read the **modern AI stack** as layers — from GPUs up to user-facing apps
+- Navigate the **build-vs-buy spectrum**: prompt an API, add retrieval, fine-tune, or pretrain
+- Put a **dollar figure** on an LLM feature using token economics
+
+**Why it matters:** Before you write a single training loop, you need a map. This day gives you
+the vocabulary and the mental model that every later tutorial slots into — so when we reach
+LoRA on Day 66 or vLLM on Day 93, you already know *where they live* and *why they exist*.
+
+**Prerequisites:** Comfort with basic Python (lists, functions, dictionaries). No ML background assumed.
+:::
+
+## What AI engineering is — and isn't
+
+**AI engineering is the discipline of building reliable products on top of machine-learning
+models — especially large pretrained models — and running them in production.** The center of
+gravity has shifted: a decade ago the hard part was *training* a model from scratch; today a
+handful of labs train the frontier models and everyone else *adapts and deploys* them. AI
+engineering is the work in that second clause.
+
+It helps to locate the role among its neighbors:
+
+| Role | Core question | Typical output |
+|------|---------------|----------------|
+| ML researcher | "Can a new architecture learn this better?" | A paper, a novel model |
+| Data scientist | "What does the data tell us?" | An analysis, a forecast |
+| ML engineer | "How do I train and serve *this* model at scale?" | A training + serving pipeline |
+| **AI engineer** | "How do I build a **reliable product** on a pretrained model?" | A shipped feature: RAG, an agent, a fine-tune |
+
+The boundaries blur — and you'll touch all four worlds in this course. But the AI engineer's
+defining constraint is **production**: latency budgets, cost ceilings, evaluation, safety, and
+the unglamorous reality that a model that's right 95% of the time is wrong one call in twenty.
+
+::: {.callout-tip}
+A useful litmus test: research optimizes a *metric on a benchmark*; AI engineering optimizes a
+*product outcome under constraints*. The second almost always involves trade-offs the benchmark
+never mentions — money, speed, and what happens when the model is confidently wrong.
+:::
+
+## The modern AI stack
+
+Think of the field as a layered stack. Each layer hides the one below it, and AI engineers
+mostly live in the top two — but the leaks from lower layers (cost, latency, context limits)
+are exactly what make the job interesting.
+
+```{mermaid}
+flowchart TB
+  A["<b>Applications</b><br/>chatbots · copilots · agents · RAG search"]
+  B["<b>Orchestration</b><br/>prompts · tools · memory · retrieval · guardrails"]
+  C["<b>Models</b><br/>Claude · GPT · Llama · embeddings · open weights"]
+  D["<b>Training &amp; adaptation</b><br/>pretraining · fine-tuning · LoRA · alignment"]
+  E["<b>Serving &amp; infra</b><br/>vLLM · quantization · KV cache · vector DBs"]
+  F["<b>Hardware</b><br/>GPUs · TPUs · accelerators"]
+  A --> B --> C --> D --> E --> F
+```
+
+You will build something at *every* one of these layers over the next 120 days. A rough map of
+where the course spends its time:
+
+```{mermaid}
+flowchart LR
+  S1["Foundations<br/>Days 1–25"] --> S2["Transformers<br/>&amp; internals<br/>Days 26–55"]
+  S2 --> S3["Using LLMs<br/>Days 56–65"]
+  S3 --> S4["Fine-tuning<br/>track<br/>Days 66–95"]
+  S4 --> S5["RAG · Agents<br/>· LLMOps<br/>Days 96–115"]
+  S5 --> S6["Capstone<br/>Days 116–120"]
+```
+
+## The build-vs-buy spectrum
+
+When you need a model to do something new, you have a spectrum of options ordered by **cost,
+effort, and control**. The single most important architectural decision in AI engineering is
+choosing the *cheapest* point on this spectrum that meets the requirement.
+
+```{mermaid}
+flowchart LR
+  A["Prompt<br/>an API"] --> B["Add retrieval<br/>(RAG)"]
+  B --> C["Fine-tune<br/>(LoRA / QLoRA)"]
+  C --> D["Pretrain<br/>from scratch"]
+  A -. "more control, more cost, more effort" .-> D
+```
+
+- **Prompting** — change behavior with words alone. Minutes to iterate; zero training. Start here.
+- **RAG** — give the model the *right context* at query time by retrieving from your data. The
+  fix for "the model doesn't know about my documents."
+- **Fine-tuning** — adjust the model's weights on your examples. The fix for "I need a
+  consistent style/format the prompt can't reliably enforce." (Sections 14–17.)
+- **Pretraining** — train a base model yourself. Almost never the right answer outside a frontier
+  lab; we build a tiny one on Day 51–55 purely to demystify it.
+
+::: {.callout-tip}
+Default to the leftmost option that works. Teams routinely reach for fine-tuning when a better
+prompt or a retrieval step would have solved it in an afternoon for a fraction of the cost.
+:::
+
+## Token economics: putting a number on it
+
+Most AI features today call a hosted model and **pay per token** — roughly, per word-piece of
+input and output. Pricing is quoted per *million* tokens, and crucially the **output price is
+usually several times the input price**. The cost of a single request is:
+
+$$
+\text{cost} \;=\; \frac{T_\text{in}}{10^6}\, p_\text{in} \;+\; \frac{T_\text{out}}{10^6}\, p_\text{out}
+$$
+
+where $T_\text{in}, T_\text{out}$ are the input and output token counts and $p_\text{in},
+p_\text{out}$ are the per-million-token prices. Multiply by your request volume and this tiny
+formula drives real architectural choices — caching, model selection, and how much context you
+dare to stuff into a prompt.
+
+## Worked example
+
+Let's estimate the monthly cost of a support-assistant feature. Suppose each request sends
+~1,500 input tokens (system prompt + retrieved context + question) and gets back ~400 tokens,
+and you serve 50,000 requests a month. We'll compare a capable model against a cheaper one.
+
+```{python}
+def request_cost(t_in, t_out, p_in, p_out):
+    """Cost of one request in dollars. Prices are $ per 1M tokens."""
+    return (t_in / 1e6) * p_in + (t_out / 1e6) * p_out
+
+# Illustrative prices ($ per 1M tokens) — always check current rates.
+models = {
+    "capable":  {"p_in": 3.00, "p_out": 15.00},
+    "cheap":    {"p_in": 0.25, "p_out": 1.25},
+}
+
+t_in, t_out, volume = 1500, 400, 50_000
+
+for name, price in models.items():
+    per_call = request_cost(t_in, t_out, price["p_in"], price["p_out"])
+    monthly = per_call * volume
+    print(f"{name:8s}: ${per_call:.5f}/call → ${monthly:,.0f}/month")
+```
+
+Notice how the output tokens dominate despite being fewer in count — that's the higher
+$p_\text{out}$ at work. The same feature can differ ~10× in cost purely by model choice, before
+you've changed a line of product logic. *This* is the kind of leverage AI engineering is about.
+
+::: {.callout-tip}
+A cheap model that's "good enough" on 90% of requests, with the capable model reserved for the
+hard 10% (a **router**), often beats either model alone on the cost/quality frontier. You'll
+build patterns like this later in the course.
+:::
+
+## Key takeaways
+
+- **AI engineering** builds reliable *products* on pretrained models under production
+  constraints — distinct from research (new models) and data science (insight).
+- The field is a **layered stack**; AI engineers work mostly in applications and orchestration,
+  but lower-layer leaks (cost, latency, context limits) shape every decision.
+- The **build-vs-buy spectrum** runs prompting → RAG → fine-tuning → pretraining, increasing in
+  cost and control. Default to the cheapest point that works.
+- **Token economics** turns design choices into dollars; output tokens usually cost the most,
+  and model choice can swing cost by an order of magnitude.
+
+## Check your understanding
+
+**1.** In one sentence, what most distinguishes an AI engineer's goal from an ML researcher's?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+An AI engineer optimizes a **product outcome under production constraints** (cost, latency,
+reliability, safety), whereas an ML researcher optimizes a **metric on a benchmark**, typically
+by inventing or improving models.
+:::
+
+**2.** You need a model to answer questions about your company's internal wiki, which it has
+never seen. Which point on the build-vs-buy spectrum should you try *first*, and why?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+**RAG (retrieval-augmented generation).** The problem is missing *knowledge*, not missing
+*behavior* — so retrieve the relevant wiki passages and put them in the prompt at query time.
+It's far cheaper and faster to iterate on than fine-tuning, and keeps answers grounded in
+current documents.
+:::
+
+**3.** In the cost formula, why can output tokens dominate the bill even when there are fewer of
+them than input tokens?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Because the per-token output price $p_\text{out}$ is typically several times the input price
+$p_\text{in}$. A small number of output tokens at a high rate can outweigh many input tokens at
+a low rate — e.g. 400 output tokens at \$15/1M vs 1,500 input tokens at \$3/1M.
+:::
+
+**4.** Name two "leaks" from lower layers of the stack that an application-layer AI engineer
+still has to reason about.
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Any two of: **cost** (token pricing / GPU spend), **latency** (serving and decoding speed),
+**context-window limits**, and **reliability/failure modes** of the model. These originate in
+the model/serving/hardware layers but surface directly in the product.
+:::
+
+**5.** A teammate proposes pretraining a model from scratch to improve answer formatting.
+What's a cheaper alternative, and what's the general principle?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Try **prompting** first (specify the format explicitly), and if that's not reliable enough,
+**fine-tune** (e.g. LoRA) on formatted examples. The principle: **default to the leftmost /
+cheapest point on the build-vs-buy spectrum that meets the requirement.** Pretraining is almost
+never justified outside a frontier lab.
+:::
+
+## Coding tasks
+
+Work these in the paired notebook — open it in Colab (no GPU needed for Day 1):
+
+### Task 1 — An LLM cost estimator
+
+Write a function `monthly_cost(t_in, t_out, volume, p_in, p_out)` that returns the estimated
+monthly cost in dollars for an LLM feature, where `p_in`/`p_out` are prices per **1 million**
+tokens and `volume` is requests per month. Then use it to estimate the cost of a feature with
+800 input tokens and 250 output tokens at 120,000 requests/month, priced at \$3 / \$15 per 1M
+tokens.
+
+{{< colab notebooks/01-foundations/01-what-is-ai-engineering.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+def monthly_cost(t_in, t_out, volume, p_in, p_out):
+    per_call = (t_in / 1e6) * p_in + (t_out / 1e6) * p_out
+    return per_call * volume
+
+cost = monthly_cost(800, 250, 120_000, 3.00, 15.00)
+print(f"${cost:,.2f} / month")   # $738.00 / month
+```
+:::
+
+### Task 2 — Pick the cheaper model
+
+You're given a dictionary of candidate models, each with `p_in` and `p_out` prices per 1M
+tokens, and a fixed workload (`t_in`, `t_out`, `volume`). Write a function `cheapest(models,
+t_in, t_out, volume)` that returns the **name** of the model with the lowest monthly cost.
+Verify it on the dictionary below.
+
+{{< colab notebooks/01-foundations/01-what-is-ai-engineering.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+def cheapest(models, t_in, t_out, volume):
+    def cost(p):
+        return monthly_cost(t_in, t_out, volume, p["p_in"], p["p_out"])
+    return min(models, key=lambda name: cost(models[name]))
+
+models = {
+    "capable": {"p_in": 3.00, "p_out": 15.00},
+    "cheap":   {"p_in": 0.25, "p_out": 1.25},
+    "mid":     {"p_in": 1.00, "p_out": 5.00},
+}
+cheapest(models, 1500, 400, 50_000)   # 'cheap'
+```
+:::
+
+## References & further reading
+
+- [Anthropic — Building effective agents](https://www.anthropic.com/research/building-effective-agents)
+- [Anthropic — Pricing & models overview](https://docs.anthropic.com/en/docs/about-claude/models)
+- Chip Huyen, ["Building LLM applications for production"](https://huyenchip.com/2023/04/11/llm-engineering.html)
+
+## Further references and details
+
+External resources to go deeper than this 30-minute tour allows. Each note says *what* it adds
+and *why* it's worth your time.
+
+- **[*AI Engineering* by Chip Huyen (O'Reilly, 2025)](https://www.oreilly.com/library/view/ai-engineering/9781098166298/)**
+  — the definitive book-length treatment of this whole field; an excellent companion to read in
+  parallel with this course.
+- **[Anthropic's prompt engineering guide](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)**
+  — concrete techniques for the leftmost (and most underrated) point of the build-vs-buy
+  spectrum; you'll lean on these long before you ever fine-tune.
+- **[The Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)** — a
+  visual primer on the architecture under every model in the stack; a perfect warm-up for
+  Section 6, where we build self-attention from scratch.
+- **[Andrej Karpathy — "Intro to LLMs" (1-hour talk)](https://www.youtube.com/watch?v=zjkBMFhNj_g)**
+  — a clear, big-picture mental model of how LLMs are trained and used, from someone who has
+  built them at scale.
