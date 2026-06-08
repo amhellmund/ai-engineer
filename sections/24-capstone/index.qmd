@@ -1,0 +1,8 @@
+---
+title: "24 · Capstone & Responsible AI"
+---
+
+::: {.callout-note}
+🚧 Tutorials for this section are **coming soon**. See the
+[full curriculum](../index.qmd) for the planned topics.
+:::

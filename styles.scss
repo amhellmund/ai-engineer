@@ -1,0 +1,41 @@
+/*-- scss:defaults --*/
+
+// Slightly larger base type for comfortable long-form reading.
+$font-size-root: 17px;
+$body-color: #1f2329;
+$link-color: #0b6bcb;
+
+/*-- scss:rules --*/
+
+// "Open in Colab" badge produced by the {{< colab >}} shortcode.
+.colab-badge {
+  display: inline-block;
+  margin: 0.4rem 0;
+}
+.colab-badge img {
+  vertical-align: middle;
+}
+
+// Draft banner shown on tutorials with `status: draft` in their front matter.
+.draft-banner {
+  border: 1px solid #f0c36d;
+  background: #fff8e6;
+  color: #7a5b00;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+// Tutorial metadata strip (day · section · est-time) under the title.
+.tutorial-meta {
+  color: #5a6573;
+  font-size: 0.9rem;
+  margin-top: -0.4rem;
+  margin-bottom: 1rem;
+}
+
+// Give "Check your understanding" answer callouts a calm, distinct tint.
+.callout.callout-style-default.callout-tip {
+  border-left-color: #0b6bcb;
+}

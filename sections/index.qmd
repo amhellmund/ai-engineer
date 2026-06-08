@@ -1,0 +1,40 @@
+---
+title: "Curriculum"
+subtitle: "24 sections × 5 tutorials = 120 days"
+toc: true
+---
+
+The full roadmap below. Use the sidebar to jump into any tutorial. The arc runs:
+**Foundations → Transformers & internals → Using LLMs → Fine-tuning → Applications →
+Production & capstone.**
+
+| #  | Section | Theme |
+|----|---------|-------|
+| 1  | AI Engineering Foundations & Setup | Tooling, Python, workflow |
+| 2  | Math & Data Essentials for ML | The minimum viable math |
+| 3  | PyTorch Fundamentals | Tensors, autograd, training loop |
+| 4  | Neural Networks & Deep-Network Training | Perceptron → MLP → backprop, optimizers |
+| 5  | Embeddings & NLP Foundations | Dense vectors, classical NLP, RNNs |
+| 6  | The Transformer Architecture | Self-attention from scratch |
+| 7  | Modern Transformer Internals | RoPE, GQA/MQA, RMSNorm, SwiGLU |
+| 8  | KV Caching & Efficient Inference | KV cache, PagedAttention, speculative decoding |
+| 9  | Tokenization, Losses & Optimization | BPE, cross-entropy, AdamW |
+| 10 | Encoders, Decoders & Pretraining Objectives | BERT / GPT / T5, transfer learning |
+| 11 | Building & Training a Small LLM | nanoGPT-style hands-on |
+| 12 | Working with Pretrained LLMs & APIs | HF ecosystem, Claude API, local models |
+| 13 | Prompt Engineering & In-Context Learning | Prompting, CoT, structured output |
+| 14 | PEFT: LoRA & QLoRA | Low-rank adapters |
+| 15 | Fine-Tuning Pipelines: Axolotl & Unsloth | Modern FT stack, hands-on |
+| 16 | Data Engineering for Fine-Tuning | Curation, synthetic data |
+| 17 | Alignment & Preference Optimization | SFT, RM, DPO/ORPO/SimPO |
+| 18 | LLM Evaluation & Observability | lm-eval-harness, LLM-as-judge |
+| 19 | Quantization, Serving & Model Merging | GPTQ/AWQ/GGUF, vLLM, mergekit |
+| 20 | Retrieval-Augmented Generation (RAG) | Chunking → pipeline → eval |
+| 21 | Vector Databases & Search Infrastructure | ANN, FAISS, production DBs |
+| 22 | AI Agents | ReAct, tools, multi-agent |
+| 23 | Production LLMOps: Serving, Monitoring & Security | Deploy, observe, guardrails |
+| 24 | Capstone & Responsible AI | End-to-end build, ethics, portfolio |
+
+: The 24 sections {.striped}
+
+For the tutorial-by-tutorial breakdown, see [PLAN.md](https://github.com/amhellmund/ai-engineering-in-100-days/blob/develop/PLAN.md).

@@ -1,0 +1,50 @@
+---
+title: "AI Engineering in 100 Days"
+subtitle: "Become an AI engineer with solid, hands-on knowledge — one 30-minute tutorial a day."
+toc: false
+---
+
+There's no shortage of AI tutorials, but most jump straight to calling an API or gloss over
+*why* things work. This curriculum takes the opposite approach: build a **solid foundation**
+that goes all the way from the base components of modern AI up to running models and agents
+in production.
+
+You start by understanding the building blocks — PyTorch, embeddings, transformers, training
+loops — and progressively work up to fine-tuning, alignment, evaluation, retrieval, agents,
+and LLMOps. Every topic is a short, self-contained, hands-on tutorial you can finish in about
+**30 minutes a day**.
+
+## What you'll learn
+
+By the end you'll be able to:
+
+- Understand transformers from the inside out — self-attention, RoPE, GQA, KV caching
+- Build and train a small language model from scratch
+- Fine-tune open models with modern pipelines (LoRA/QLoRA, Axolotl, Unsloth)
+- Curate and generate training data, and align models with DPO/ORPO/SimPO
+- Evaluate models rigorously (lm-eval-harness, LLM-as-judge) and track experiments
+- Quantize, serve, and merge models (GPTQ/AWQ/GGUF, vLLM, mergekit)
+- Build RAG systems and AI agents
+- Deploy, monitor, and secure LLM applications in production
+
+## Format
+
+- **120 tutorials**, one per day, ~30 minutes each
+- Grouped into **24 sections of 5 tutorials**
+- Ordered so each topic builds on the last — foundations first, no hand-waving
+
+The learning arc:
+
+**Foundations** → **Transformers & internals** → **Using LLMs** → **Fine-tuning track** →
+**Applications (RAG & agents)** → **Production & capstone**
+
+## Getting started
+
+1. Skim the [full curriculum](sections/index.qmd) to see the whole roadmap.
+2. Read [How to use](about.qmd) for setup and how each tutorial is structured.
+3. Start at Section 1, Tutorial 1 — and do one a day.
+
+::: {.callout-tip}
+Each tutorial ends with **5 control questions** to self-test and **2 Python coding tasks**
+you can open directly in Google Colab.
+:::

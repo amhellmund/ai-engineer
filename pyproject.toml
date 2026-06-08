@@ -1,0 +1,30 @@
+[project]
+name = "ai-engineer"
+version = "0.1.0"
+description = "A 120-day, hands-on AI engineering curriculum."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Andi Hellmund", email = "am.hellmund@gmail.com" }]
+
+# Runtime/authoring dependencies used by executable code cells in the tutorials.
+# Kept deliberately light so CI (which relies on committed _freeze/ outputs) and
+# local previews install fast. Heavy / GPU-only libs live in the Colab notebooks,
+# not here.
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "matplotlib>=3.9",
+    "jupyter>=1.1",    # provides the kernel Quarto uses to execute {python} cells
+    "ipykernel>=6.29",
+]
+
+[dependency-groups]
+# `uv sync` installs this group by default; keep dev-only tooling here.
+dev = [
+    "nbformat>=5.10", # used when scaffolding paired Colab notebooks
+]
+
+[tool.uv]
+# Build the docs site only — there is no importable package to install.
+package = false

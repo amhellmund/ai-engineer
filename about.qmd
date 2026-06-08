@@ -1,0 +1,50 @@
+---
+title: "How to use this course"
+toc: true
+---
+
+## Who it's for
+
+Developers and ML practitioners who want to go beyond surface-level API usage and genuinely
+understand how modern AI systems work — and how to build, adapt, and ship them. Comfort with
+Python is assumed; the necessary math and deep-learning fundamentals are covered along the way.
+
+## The daily rhythm
+
+One tutorial per day, ~30 minutes. Each one is self-contained but builds on the last, so work
+through them in order. Don't just read — run the code and attempt the exercises.
+
+## Anatomy of every tutorial
+
+Every tutorial follows the same structure, so you always know where to find things:
+
+1. **In this tutorial** — a short intro: what you'll learn, why it matters, and prerequisites.
+2. **Concepts** — the core ideas, with diagrams and formulas where they help.
+3. **Worked example** — runnable Python you can follow along with.
+4. **Key takeaways** — the few things to remember.
+5. **Check your understanding** — 5 control questions with reveal-able answers.
+6. **Coding tasks** — 2 Python exercises, each openable in Google Colab, with solutions.
+7. **References** — where to go deeper.
+
+## Running the code
+
+Two ways to run the hands-on parts:
+
+- **Google Colab (recommended for GPU work).** The coding tasks in each tutorial have an
+  **Open in Colab** badge. Colab gives you a free GPU — important for the fine-tuning,
+  quantization, and serving sections.
+- **Locally.** Clone the repo and use [`uv`](https://docs.astral.sh/uv/):
+
+  ```bash
+  git clone https://github.com/amhellmund/ai-engineering-in-100-days.git
+  cd ai-engineering-in-100-days
+  uv sync
+  ```
+
+  Then run a notebook with `uv run jupyter lab` (lightweight tutorials run fine on CPU).
+
+## A note on the content
+
+Tutorials are drafted with AI assistance and reviewed by a human before publishing. A tutorial
+still marked **draft** may change. Found an error? Open an issue on
+[GitHub](https://github.com/amhellmund/ai-engineering-in-100-days).

@@ -1,0 +1,110 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "sections/**/*.qmd"
+
+website:
+  title: "AI Engineering in 100 Days"
+  description: "A 120-day, hands-on AI / ML / LLM / GenAI curriculum — one 30-minute tutorial a day."
+  repo-url: https://github.com/amhellmund/ai-engineering-in-100-days
+  repo-actions: [source, issue]
+  page-navigation: true
+  reader-mode: true
+  search:
+    location: sidebar
+    type: textbox
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: about.qmd
+        text: How to use
+      - text: Curriculum
+        href: sections/index.qmd
+  sidebar:
+    style: floating
+    collapse-level: 1
+    contents:
+      - section: "01 · Foundations & Setup"
+        contents: sections/01-foundations/*.qmd
+      - section: "02 · Math & Data Essentials"
+        contents: sections/02-math-data/*.qmd
+      - section: "03 · PyTorch Fundamentals"
+        contents: sections/03-pytorch/*.qmd
+      - section: "04 · Neural Networks & Training"
+        contents: sections/04-neural-networks/*.qmd
+      - section: "05 · Embeddings & NLP Foundations"
+        contents: sections/05-embeddings-nlp/*.qmd
+      - section: "06 · The Transformer Architecture"
+        contents: sections/06-transformer/*.qmd
+      - section: "07 · Modern Transformer Internals"
+        contents: sections/07-modern-transformer/*.qmd
+      - section: "08 · KV Caching & Efficient Inference"
+        contents: sections/08-kv-caching/*.qmd
+      - section: "09 · Tokenization, Losses & Optimization"
+        contents: sections/09-tokenization-optimization/*.qmd
+      - section: "10 · Encoders, Decoders & Pretraining"
+        contents: sections/10-encoders-decoders/*.qmd
+      - section: "11 · Building & Training a Small LLM"
+        contents: sections/11-small-llm/*.qmd
+      - section: "12 · Pretrained LLMs & APIs"
+        contents: sections/12-pretrained-llms/*.qmd
+      - section: "13 · Prompt Engineering & ICL"
+        contents: sections/13-prompt-engineering/*.qmd
+      - section: "14 · PEFT: LoRA & QLoRA"
+        contents: sections/14-peft/*.qmd
+      - section: "15 · Fine-Tuning Pipelines"
+        contents: sections/15-finetuning-pipelines/*.qmd
+      - section: "16 · Data Engineering for FT"
+        contents: sections/16-data-engineering/*.qmd
+      - section: "17 · Alignment & Preference Optimization"
+        contents: sections/17-alignment/*.qmd
+      - section: "18 · LLM Evaluation & Observability"
+        contents: sections/18-evaluation/*.qmd
+      - section: "19 · Quantization, Serving & Merging"
+        contents: sections/19-quantization-serving/*.qmd
+      - section: "20 · Retrieval-Augmented Generation"
+        contents: sections/20-rag/*.qmd
+      - section: "21 · Vector DBs & Search"
+        contents: sections/21-vector-dbs/*.qmd
+      - section: "22 · AI Agents"
+        contents: sections/22-agents/*.qmd
+      - section: "23 · Production LLMOps"
+        contents: sections/23-llmops/*.qmd
+      - section: "24 · Capstone & Responsible AI"
+        contents: sections/24-capstone/*.qmd
+  page-footer:
+    left: "© 2026 Andi Hellmund · MIT License"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      - cosmo
+      - styles.scss
+    toc: true
+    toc-depth: 3
+    toc-expand: true
+    code-copy: true
+    code-overflow: wrap
+    code-fold: false
+    code-tools: false
+    html-math-method: katex
+    mermaid:
+      theme: default
+    link-external-newwindow: true
+    smooth-scroll: true
+
+# Cache executed code-cell outputs. Committing _freeze/ lets CI render the site
+# without re-running (and without a GPU). Re-render locally to refresh.
+execute:
+  freeze: auto
+
+# Default Python kernel for {python} cells.
+jupyter: python3
+
+# Consumed by the {{< colab >}} shortcode (_extensions/colab) to build badge URLs.
+colab-repo: amhellmund/ai-engineering-in-100-days
+colab-branch: develop

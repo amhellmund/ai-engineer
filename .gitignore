@@ -1,0 +1,17 @@
+# Quarto build output & cache
+/_site/
+/.quarto/
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+
+# NOTE: _freeze/ is intentionally NOT ignored — committed executed outputs let CI
+# render the site without a GPU. See CLAUDE.md.

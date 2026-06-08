@@ -1,0 +1,168 @@
+---
+# ─────────────────────────────────────────────────────────────────────────────
+# TUTORIAL TEMPLATE — copy this file to sections/NN-section/NN-topic.qmd
+# Fill every section below. Keep the structure; the invariants are enforced in
+# review: exactly 5 control questions and exactly 2 Python coding tasks.
+# See CLAUDE.md for conventions and the `new-tutorial` skill for the workflow.
+# ─────────────────────────────────────────────────────────────────────────────
+title: "Day N — <Tutorial Title>"
+# Metadata block (drives the header strip + sidebar ordering):
+day: 0                              # 1–120, matches PLAN.md
+course-section: "NN · <Section Name>"
+est-time: "30 min"
+status: draft                       # draft | reviewed  (flip to reviewed on approval)
+objectives:                         # 3–5 bullets — the core learning aspects
+  - "<learning objective 1>"
+  - "<learning objective 2>"
+  - "<learning objective 3>"
+prerequisites:                      # earlier days this builds on
+  - "Day N-1 — <title>"
+# Paired notebook for the coding tasks (also the Colab target):
+notebook: notebooks/NN-section/NN-topic.ipynb
+---
+
+```{=html}
+<!-- Draft banner: remove or rely on status field; shown only while drafting. -->
+<div class="draft-banner">🚧 <strong>Draft</strong> — under human review, content may change.</div>
+```
+
+::: {.tutorial-meta}
+Day N · NN · <Section Name> · ⏱️ ~30 min
+:::
+
+::: {.callout-note title="In this tutorial" appearance="simple"}
+**You'll learn to:**
+
+- <core learning aspect 1>
+- <core learning aspect 2>
+- <core learning aspect 3>
+
+**Why it matters:** <one or two sentences connecting this to the bigger picture.>
+
+**Prerequisites:** <Day N-1 — title>, and comfort with <…>.
+:::
+
+## <Concept section 1>
+
+Explain the core idea. Use a **formula** where it sharpens understanding:
+
+$$
+y = f(x) = \mathbf{W}x + \mathbf{b}
+$$
+
+…and a **diagram** to show structure (Mermaid for flows, Graphviz for graphs):
+
+```{mermaid}
+flowchart LR
+  A[Input] --> B[Transform] --> C[Output]
+```
+
+Add an **image** where a photo/figure beats a diagram:
+
+![Descriptive caption.](../../assets/img/NN/figure-name.png){#fig-example width=70%}
+
+::: {.callout-tip}
+A useful aside, intuition, or gotcha.
+:::
+
+## <Concept section 2>
+
+Continue building the idea. Cross-reference figures with `@fig-example` when helpful.
+
+## Worked example
+
+Walk through runnable code. Lightweight cells execute at build and embed their output;
+the committed `_freeze/` cache means CI never re-runs them.
+
+```{python}
+import numpy as np
+
+x = np.arange(6).reshape(2, 3)
+x
+```
+
+::: {.callout-warning title="GPU-only code"}
+If a step needs a GPU (training, quantized inference), show it as a **non-executed** block
+(plain ```` ```python ````) and keep the runnable version in the paired Colab notebook.
+:::
+
+## Key takeaways
+
+- <takeaway 1>
+- <takeaway 2>
+- <takeaway 3>
+
+## Check your understanding
+
+**1.** <Question 1?>
+
+::: {.callout-tip title="Show answer" collapse="true"}
+<Answer 1.>
+:::
+
+**2.** <Question 2?>
+
+::: {.callout-tip title="Show answer" collapse="true"}
+<Answer 2.>
+:::
+
+**3.** <Question 3?>
+
+::: {.callout-tip title="Show answer" collapse="true"}
+<Answer 3.>
+:::
+
+**4.** <Question 4?>
+
+::: {.callout-tip title="Show answer" collapse="true"}
+<Answer 4.>
+:::
+
+**5.** <Question 5?>
+
+::: {.callout-tip title="Show answer" collapse="true"}
+<Answer 5.>
+:::
+
+## Coding tasks
+
+Work these in the paired notebook — open it in Colab (free GPU for the heavy sections):
+
+### Task 1 — <short name>
+
+<What to build / what "done" looks like. State inputs, expected output, constraints.>
+
+{{< colab notebooks/NN-section/NN-topic.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+# Reference solution for Task 1
+```
+:::
+
+### Task 2 — <short name>
+
+<Second task — ideally a small extension or a different angle on the same concept.>
+
+{{< colab notebooks/NN-section/NN-topic.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+# Reference solution for Task 2
+```
+:::
+
+## References & further reading
+
+- <Paper / docs / blog post — with link>
+- <…>
+
+## Further references and details
+
+External resources to go deeper than this 30-minute tutorial allows. Annotate each one so
+the reader knows *what* it adds and *why* it's worth their time.
+
+- **[<Resource title>](https://…)** — <what it covers and why to read it (e.g. the canonical
+  paper, an interactive visualization, a longer course module).>
+- **[<Resource title>](https://…)** — <one line on the depth/angle it adds beyond the above.>
+- **[<Resource title>](https://…)** — <…>

@@ -1,0 +1,8 @@
+---
+title: "05 · Embeddings & NLP Foundations"
+---
+
+::: {.callout-note}
+🚧 Tutorials for this section are **coming soon**. See the
+[full curriculum](../index.qmd) for the planned topics.
+:::

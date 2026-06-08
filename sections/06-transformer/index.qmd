@@ -1,0 +1,8 @@
+---
+title: "06 · The Transformer Architecture"
+---
+
+::: {.callout-note}
+🚧 Tutorials for this section are **coming soon**. See the
+[full curriculum](../index.qmd) for the planned topics.
+:::

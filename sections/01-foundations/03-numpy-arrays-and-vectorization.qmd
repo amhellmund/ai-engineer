@@ -1,0 +1,268 @@
+---
+title: "Day 3 — NumPy Arrays & Vectorization"
+day: 3
+course-section: "01 · Foundations & Setup"
+est-time: "30 min"
+status: draft
+objectives:
+  - "Create, reshape, and index NumPy arrays with confidence"
+  - "Replace Python loops with vectorized array operations"
+  - "Understand broadcasting and use it deliberately"
+  - "Reason about why vectorized code is dramatically faster"
+prerequisites:
+  - "Day 2 — Environment setup (Python, uv, Jupyter)"
+notebook: notebooks/01-foundations/03-numpy-arrays-and-vectorization.ipynb
+---
+
+```{=html}
+<div class="draft-banner">🚧 <strong>Draft</strong> — under human review, content may change.</div>
+```
+
+::: {.tutorial-meta}
+Day 3 · 01 · Foundations & Setup · ⏱️ ~30 min
+:::
+
+::: {.callout-note title="In this tutorial" appearance="simple"}
+**You'll learn to:**
+
+- Create and reshape NumPy arrays, and index them with slices and masks
+- Replace explicit Python loops with **vectorized** operations
+- Use **broadcasting** to combine arrays of different shapes
+- Explain *why* vectorized NumPy is orders of magnitude faster than Python loops
+
+**Why it matters:** Every tensor you'll touch in PyTorch later is a NumPy array's
+spiritual sibling. The mental model you build here — *think in arrays, not loops* — is the
+single most transferable skill for the rest of this course.
+
+**Prerequisites:** Day 2 — Environment setup, and basic Python (lists, functions).
+:::
+
+## The array: NumPy's one big idea
+
+A Python list is a box of arbitrary objects scattered across memory. A NumPy **`ndarray`** is
+a contiguous block of *same-typed* numbers plus a small header describing its **shape** and
+**dtype**. That layout is what makes NumPy fast — and what lets a single operation apply to an
+entire array at once.
+
+```{python}
+import numpy as np
+
+x = np.arange(6).reshape(2, 3)
+x
+```
+
+Three attributes describe any array:
+
+```{python}
+x.shape, x.dtype, x.ndim
+```
+
+The mental model: an array is *data* (the flat buffer) plus *metadata* (how to interpret it).
+Reshaping changes only the metadata, not the buffer.
+
+```{dot}
+//| label: fig-ndarray
+//| fig-cap: "An ndarray = a flat memory buffer + shape/dtype metadata."
+digraph G {
+  rankdir=LR;
+  node [shape=record, fontname="Helvetica", style=filled, fillcolor="#eef4fb"];
+  meta [label="{ndarray | shape = (2, 3) | dtype = int64 | strides}"];
+  buf  [label="{buffer | 0 | 1 | 2 | 3 | 4 | 5}", fillcolor="#fff3e0"];
+  meta -> buf [label="views"];
+}
+```
+
+## Vectorization: stop writing loops
+
+"Vectorization" means expressing a computation as operations on whole arrays so the looping
+happens in optimized C, not in the Python interpreter. Compare squaring a million numbers:
+
+```{python}
+import time
+
+n = 1_000_000
+data = np.arange(n, dtype=np.float64)
+
+t0 = time.perf_counter()
+loop = [v * v for v in data]          # Python-level loop
+t_loop = time.perf_counter() - t0
+
+t0 = time.perf_counter()
+vec = data * data                     # vectorized — one C-level pass
+t_vec = time.perf_counter() - t0
+
+print(f"loop:       {t_loop*1000:7.1f} ms")
+print(f"vectorized: {t_vec*1000:7.1f} ms")
+print(f"speedup:    {t_loop/t_vec:7.0f}×")
+```
+
+Same result, but the vectorized form is typically **50–200× faster** — and shorter to read.
+The flow you want to internalize:
+
+```{mermaid}
+flowchart LR
+  A[Python loop<br/>per-element] -->|rewrite| B[Whole-array op]
+  B --> C[C runs the loop]
+  C --> D[Fast + concise]
+```
+
+::: {.callout-tip}
+Rule of thumb: if you're writing a `for` loop over array elements, pause — there's almost
+always a vectorized expression that's faster and clearer.
+:::
+
+## Broadcasting: combining different shapes
+
+Vectorized ops need matching shapes — but NumPy will **broadcast** a smaller array across a
+larger one when their shapes are compatible. Two dimensions are compatible when they are equal
+or one of them is `1`. Conceptually, a size-`1` axis is *stretched* to match:
+
+![A `(3,1)` column and a `(1,3)` row broadcast to a `(3,3)` result.](../../assets/img/01/broadcasting.png){#fig-broadcast width=85%}
+
+In code, no data is actually copied — NumPy just iterates cleverly:
+
+```{python}
+col = np.array([[10], [20], [30]])   # shape (3, 1)
+row = np.array([[1, 2, 3]])          # shape (1, 3)
+col + row                            # shape (3, 3)
+```
+
+A common real use: standardizing each column of a dataset (subtract per-column mean, divide by
+per-column std). The means have shape `(3,)` and broadcast across all rows:
+
+```{python}
+m = np.array([[1.0, 2.0, 3.0],
+              [4.0, 5.0, 6.0],
+              [7.0, 8.0, 9.0]])
+standardized = (m - m.mean(axis=0)) / m.std(axis=0)
+standardized.round(3)
+```
+
+The standardization formula, per column $j$:
+
+$$
+z_{ij} = \frac{x_{ij} - \mu_j}{\sigma_j},
+\qquad
+\mu_j = \frac{1}{n}\sum_{i=1}^{n} x_{ij}.
+$$
+
+## Indexing: slices and boolean masks
+
+Beyond integer indexing, two tools do most of the heavy lifting. **Slices** return *views*
+(no copy); **boolean masks** select elements by condition:
+
+```{python}
+a = np.arange(10)
+evens = a[a % 2 == 0]     # boolean mask
+a[a > 5] = 0              # masked assignment
+evens, a
+```
+
+## Key takeaways
+
+- An `ndarray` is a contiguous, same-dtype buffer plus shape/dtype metadata — reshaping is
+  cheap because it only touches metadata.
+- **Vectorize**: express computation as whole-array operations; the loop runs in C.
+- **Broadcasting** lets compatible shapes combine without copying — size-`1` axes stretch.
+- Boolean masks select and assign by condition; slices return views, not copies.
+
+## Check your understanding
+
+**1.** What two things make a NumPy `ndarray` faster to compute on than a Python list of numbers?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+(1) Contiguous memory holding a single dtype, so elements sit next to each other and are
+cache-friendly; (2) operations are dispatched to compiled C loops instead of the Python
+interpreter, avoiding per-element Python overhead.
+:::
+
+**2.** `x` has shape `(2, 3)`. What is the shape after `x.reshape(3, 2)`, and is the underlying
+data buffer copied?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Shape becomes `(3, 2)`. The buffer is **not** copied — reshape returns a view with new shape
+metadata over the same data (when the array is contiguous).
+:::
+
+**3.** Are the shapes `(3, 1)` and `(1, 4)` broadcast-compatible? If so, what is the result shape?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Yes. Each axis is compatible because one side is `1`. The size-`1` axes stretch, giving a
+result of shape `(3, 4)`.
+:::
+
+**4.** Why does `data * data` produce the same result as a Python list comprehension squaring
+each element, but run far faster?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Both compute element-wise squares. The vectorized version performs the entire loop in
+optimized C over a contiguous buffer, while the comprehension pays Python interpreter overhead
+for every element (boxing, dispatch, bounds checks).
+:::
+
+**5.** Given a 2-D array `m`, what does `m.mean(axis=0)` compute, and what shape does it return
+for a `(3, 3)` input?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+It averages **down the rows** (collapsing axis 0), giving the per-column means — shape `(3,)`.
+That 1-D result then broadcasts across the rows when you write `m - m.mean(axis=0)`.
+:::
+
+## Coding tasks
+
+Work these in the paired notebook — open it in Colab (no GPU needed for Day 3):
+
+### Task 1 — Vectorize a distance computation
+
+You're given a 2-D array `points` of shape `(N, 2)` (N points in the plane) and a single
+`origin` of shape `(2,)`. Without any Python `for` loop, compute a 1-D array of the Euclidean
+distance from each point to `origin`. The Euclidean distance is
+$d_i = \sqrt{(x_i - o_x)^2 + (y_i - o_y)^2}$.
+
+{{< colab notebooks/01-foundations/03-numpy-arrays-and-vectorization.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+import numpy as np
+
+def distances(points, origin):
+    diff = points - origin          # broadcasting: (N,2) - (2,) -> (N,2)
+    return np.sqrt((diff ** 2).sum(axis=1))   # sum across x,y -> (N,)
+
+points = np.array([[0.0, 0.0], [3.0, 4.0], [1.0, 1.0]])
+origin = np.array([0.0, 0.0])
+distances(points, origin)           # array([0., 5., 1.41421356])
+```
+:::
+
+### Task 2 — Min–max normalize each column
+
+Write a function that takes a 2-D array and rescales **each column** independently to the
+range $[0, 1]$ using $x' = \dfrac{x - \min}{\max - \min}$. Use broadcasting, no loops, and
+guard against divide-by-zero when a column is constant (leave such a column as all zeros).
+
+{{< colab notebooks/01-foundations/03-numpy-arrays-and-vectorization.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+import numpy as np
+
+def minmax(m):
+    lo = m.min(axis=0)
+    hi = m.max(axis=0)
+    span = hi - lo
+    span[span == 0] = 1.0           # avoid 0/0; constant columns -> 0
+    return (m - lo) / span
+
+m = np.array([[1.0, 5.0, 7.0],
+              [3.0, 5.0, 9.0],
+              [2.0, 5.0, 8.0]])
+minmax(m)
+```
+:::
+
+## References & further reading
+
+- [NumPy: the absolute basics for beginners](https://numpy.org/doc/stable/user/absolute_beginners.html)
+- [Broadcasting — NumPy user guide](https://numpy.org/doc/stable/user/basics.broadcasting.html)
+- Harris et al., ["Array programming with NumPy", *Nature* (2020)](https://www.nature.com/articles/s41586-020-2649-2)

@@ -1,0 +1,8 @@
+---
+title: "02 · Math & Data Essentials"
+---
+
+::: {.callout-note}
+🚧 Tutorials for this section are **coming soon**. See the
+[full curriculum](../index.qmd) for the planned topics.
+:::
