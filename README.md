@@ -1,5 +1,7 @@
 # AI Engineering Fundamentals
 
+📖 **Read it online: <https://amhellmund.github.io/ai-engineer/>**
+
 > Become an AI engineer with solid, hands-on knowledge — one 30-minute tutorial a day.
 
 ## The idea

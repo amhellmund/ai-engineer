@@ -15,3 +15,5 @@ __pycache__/
 
 # NOTE: _freeze/ is intentionally NOT ignored — committed executed outputs let CI
 # render the site without a GPU. See CLAUDE.md.
+
+**/*.quarto_ipynb

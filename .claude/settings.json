@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Edit(/.claude/skills/new-tutorial/**)"
+      "Edit(/.claude/skills/new-tutorial/**)",
+      "Bash(python -c \"import json; nb=json.load\\(open\\('notebooks/01-foundations/03-numpy-arrays-and-vectorization.ipynb'\\)\\); print\\('nbformat', nb['nbformat'], nb.get\\('nbformat_minor'\\)\\); print\\('keys', list\\(nb.keys\\(\\)\\)\\); print\\('meta', json.dumps\\(nb['metadata'], indent=1\\)\\); [print\\('---', c['cell_type'], '\\\\n', ''.join\\(c['source']\\)[:200]\\) for c in nb['cells'][:4]]\")",
+      "Bash(python -c \"import json,nbformat; nbformat.read\\('notebooks/01-foundations/01-what-is-ai-engineering.ipynb', as_version=4\\); print\\('notebook valid'\\)\")"
     ]
   }
 }

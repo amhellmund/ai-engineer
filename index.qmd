@@ -1,5 +1,5 @@
 ---
-title: "AI Engineering in 100 Days"
+title: "AI Engineering in 120 Days"
 subtitle: "Become an AI engineer with solid, hands-on knowledge — one 30-minute tutorial a day."
 toc: false
 ---

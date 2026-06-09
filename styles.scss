@@ -5,6 +5,10 @@ $font-size-root: 17px;
 $body-color: #1f2329;
 $link-color: #0b6bcb;
 
+// Widen the left sidebar so the longest chapter titles fit on one line
+// (Quarto's default is 250px). Used by the floating sidebar layout.
+$grid-sidebar-width: 360px;
+
 /*-- scss:rules --*/
 
 // "Open in Colab" badge produced by the {{< colab >}} shortcode.
@@ -33,6 +37,13 @@ $link-color: #0b6bcb;
   font-size: 0.9rem;
   margin-top: -0.4rem;
   margin-bottom: 1rem;
+}
+
+// Keep sidebar chapter/section titles on a single line (no word wrap).
+.sidebar-navigation .sidebar-item .sidebar-item-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // Give "Check your understanding" answer callouts a calm, distinct tint.

@@ -6,7 +6,7 @@ project:
     - "sections/**/*.qmd"
 
 website:
-  title: "AI Engineering in 100 Days"
+  title: "AI Engineering in 120 Days"
   description: "A 120-day, hands-on AI / ML / LLM / GenAI curriculum — one 30-minute tutorial a day."
   repo-url: https://github.com/amhellmund/ai-engineering-in-100-days
   repo-actions: [source, issue]
@@ -27,7 +27,7 @@ website:
     style: floating
     collapse-level: 1
     contents:
-      - section: "01 · Foundations & Setup"
+      - section: "What is AI engineering?"
         contents: sections/01-foundations/*.qmd
       - section: "02 · Math & Data Essentials"
         contents: sections/02-math-data/*.qmd
@@ -84,9 +84,13 @@ format:
     theme:
       - cosmo
       - styles.scss
+    # Use the full viewport width: left nav sidebar · full-width body · right TOC,
+    # instead of the default centered ~800px body with large empty side margins.
+    page-layout: full
     toc: true
     toc-depth: 3
     toc-expand: true
+    toc-location: right
     code-copy: true
     code-overflow: wrap
     code-fold: false

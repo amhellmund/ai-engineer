@@ -36,8 +36,8 @@ Two ways to run the hands-on parts:
 - **Locally.** Clone the repo and use [`uv`](https://docs.astral.sh/uv/):
 
   ```bash
-  git clone https://github.com/amhellmund/ai-engineering-in-100-days.git
-  cd ai-engineering-in-100-days
+  git clone https://github.com/amhellmund/ai-engineer.git
+  cd ai-engineer
   uv sync
   ```
 
