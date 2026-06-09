@@ -155,7 +155,6 @@ import sys
 import platform
 
 print("Python version :", platform.python_version())
-print("Interpreter    :", sys.executable)
 print("Platform       :", platform.system(), platform.machine())
 
 # A trivial computation that must succeed if the interpreter works at all.
@@ -163,9 +162,17 @@ assert sum(range(10)) == 45
 print("Sanity check   : OK")
 ```
 
-`sys.executable` is the giveaway — it should point *inside* your project's `.venv`, not at the
-system Python. If it doesn't, your shell (or your notebook kernel) isn't using the environment you
-think it is.
+The single most useful field, though, is **`sys.executable`** — the absolute path of the
+interpreter running this code. It's the giveaway for *which* Python you're actually on:
+
+```python
+>>> import sys; sys.executable
+'/home/user/ai-engineer/.venv/bin/python3'   # ← should sit inside your project's .venv
+```
+
+It should point *inside* your project's `.venv`, not at the system Python (e.g.
+`/usr/bin/python3`). If it doesn't, your shell — or your notebook kernel — isn't using the
+environment you think it is.
 
 ## Key takeaways
 
