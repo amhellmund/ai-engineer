@@ -1,5 +1,5 @@
 ---
-title: "Day 2 — Setting Up Your AI Engineering Environment"
+title: "Day 2 — Setting Up Your Environment"
 day: 2
 course-section: "01 · Foundations & Setup"
 est-time: "30 min"
