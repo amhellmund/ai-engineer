@@ -1,0 +1,313 @@
+---
+title: "Day 2 — Setting Up Your AI Engineering Environment"
+day: 2
+course-section: "01 · Foundations & Setup"
+est-time: "30 min"
+status: reviewed
+objectives:
+  - "Explain why isolated, reproducible Python environments matter (the 'works on my machine' problem)"
+  - "Create and manage a project environment with uv (pyproject.toml, uv.lock, uv sync/run)"
+  - "Understand where conda and pip+venv fit, and when to reach for them"
+  - "Run code in Jupyter and VS Code, and connect a notebook kernel to your project venv"
+  - "Verify your setup with a small self-test script"
+prerequisites:
+  - "Day 1 — What is AI engineering?"
+notebook: notebooks/01-foundations/02-environment-setup.ipynb
+---
+
+::: {.tutorial-meta}
+Day 2 · 01 · Foundations & Setup · ⏱️ ~30 min
+:::
+
+::: {.callout-note title="In this tutorial" appearance="simple"}
+**You'll learn to:**
+
+- Explain *why* isolated Python environments exist — the "works on my machine" problem
+- Drive **`uv`** to create a reproducible project: `pyproject.toml` → `uv.lock` → `.venv`
+- Place **conda** and **pip + venv** correctly, and know when each is the right tool
+- Run code in **Jupyter** and **VS Code**, with the notebook kernel pointed at your project venv
+- **Verify** the whole thing works with a tiny self-test script
+
+**Why it matters:** Every later tutorial — NumPy tomorrow, PyTorch in Section 3, a fine-tuning run in
+Section 14 — assumes you can spin up the *exact* environment it needs and get the *same* result twice.
+Reproducibility is the quiet foundation the whole course stands on; we set it once, here, and stop
+worrying about it.
+
+**Prerequisites:** Day 1 — What is AI engineering?, and comfort running commands in a terminal.
+:::
+
+## Why environments exist: the "works on my machine" problem
+
+Your operating system ships with a Python (the **system interpreter**), and it's tempting to just
+`pip install` everything into it. Don't. Two projects will eventually disagree: one needs
+`numpy 1.26`, the other `numpy 2.1`; one wants Python 3.11, the other 3.12. A single shared
+interpreter can't satisfy both, and "fixing" one project silently breaks another. The classic
+symptom is the bug that only reproduces on *your* laptop — and the equally classic non-fix, "well,
+it works on my machine."
+
+A **virtual environment** solves this by giving each project its *own* isolated interpreter and its
+*own* `site-packages` directory. Activating it puts that project's Python first on your `PATH`, so
+`import numpy` resolves to *this project's* numpy and nobody else's.
+
+::: {.callout-tip}
+The mental model: a virtual environment is a sandboxed copy of "Python + the packages this one
+project needs." Throw it away and recreate it at will — it's derived, not precious.
+:::
+
+Isolation gets you "doesn't clash with other projects." The second half of reproducibility is
+**pinning**: recording the *exact* version of every package (and every package *those* depend on)
+so a fresh machine installs the identical set. Why bother being exact? Because risk compounds. If
+each of your `n` dependencies has even a small independent probability $p_i$ of resolving to a
+subtly different, breaking version when left unpinned, the chance the whole environment reproduces
+cleanly is
+
+$$
+P_\text{reproduce} = \prod_{i=1}^{n} (1 - p_i).
+$$
+
+With 50 loosely-specified dependencies at just 1% risk each, that's $0.99^{50} \approx 0.61$ — a
+roughly **40% chance something drifts**. The fix is a **lockfile**: pin everything, and $p_i \to 0$.
+
+## The modern toolchain: `uv`
+
+[`uv`](https://docs.astral.sh/uv/) is a fast, all-in-one Python project manager (from Astral, the
+Ruff folks). It handles the interpreter, the virtual environment, dependency resolution, and the
+lockfile — replacing a pile of older tools with one. **This course standardizes on it**, and this
+very website is built with it.
+
+The workflow is a short pipeline. You declare what you *want* in `pyproject.toml`; `uv` computes
+the exact, reproducible graph into `uv.lock`; `uv sync` materializes that into a `.venv`; and
+`uv run` executes your code inside it.
+
+```{mermaid}
+flowchart LR
+  A["<b>pyproject.toml</b><br/>declared deps<br/>(numpy, …)"] -->|uv lock| B["<b>uv.lock</b><br/>exact pinned graph"]
+  B -->|uv sync| C["<b>.venv</b><br/>isolated interpreter<br/>+ packages"]
+  C -->|uv run| D["your code ·<br/>Jupyter · Quarto"]
+```
+
+In practice you rarely run `uv lock` by hand — `uv add` and `uv run` keep the lockfile and `.venv`
+current for you. A typical first session:
+
+```bash
+uv init my-project          # scaffold pyproject.toml
+cd my-project
+uv add numpy pandas         # add deps; updates pyproject.toml + uv.lock + .venv
+uv run python script.py     # run inside the project's env (auto-syncs first)
+```
+
+Cloning an existing project (like this repo) is just two steps — exactly what its `CLAUDE.md`
+documents:
+
+```bash
+uv sync                     # recreate .venv from pyproject.toml / uv.lock
+uv run quarto preview       # run a command inside that env
+```
+
+Because `uv.lock` is committed to git, a teammate (or CI, or you in six months) runs `uv sync` and
+gets the **byte-identical** dependency set. That's the reproducibility guarantee from the previous
+section, made concrete.
+
+::: {.callout-note title="Where conda and pip+venv fit"}
+- **`pip` + `venv`** — the standard-library baseline (`python -m venv .venv && pip install …`). It
+  works everywhere and is worth understanding, but it's slower and doesn't produce a lockfile by
+  itself. Think of `uv` as a faster, batteries-included superset.
+- **conda / mamba** — shines when you need **non-Python** system libraries (CUDA toolkits, MKL,
+  GDAL, compilers) bundled as prebuilt binaries, common in scientific and some GPU stacks. If your
+  stack is pure-Python, `uv` is simpler and faster; reach for conda when native dependencies fight you.
+:::
+
+## Running code: Jupyter & VS Code
+
+You'll spend most of this course in two places: **Jupyter notebooks** (for exploratory,
+cell-by-cell work — every tutorial ships a paired notebook) and **VS Code** (for editing files and
+projects). The concept that ties them to your environment is the **kernel**.
+
+A notebook is just cells of code, prose, and saved output. When you run a cell, the code executes
+in a separate Python process called the **kernel**. The single most common Jupyter confusion is a
+notebook whose kernel is some *other* Python than your project's — so `import numpy` fails even
+though you "definitely installed it." The rule: **point the kernel at your project's `.venv`.**
+
+```{mermaid}
+flowchart LR
+  NB["Notebook<br/>(.ipynb cells)"] -->|sends code to| K["Kernel<br/>(Python process)"]
+  K -.->|should be| V[".venv<br/>(this project's interpreter)"]
+```
+
+- **Jupyter:** `uv run jupyter lab` launches Jupyter *using the project venv*, so the default kernel
+  is already the right one.
+- **VS Code:** install the Python + Jupyter extensions, open the project folder, then use the
+  interpreter / kernel picker (bottom-right, or the "Select Kernel" button on a notebook) to choose
+  the `.venv` interpreter. VS Code can then run notebooks and scripts against it directly.
+
+## Worked example: a self-test script
+
+The best way to confirm an environment is real is to *ask Python about itself*. This little report
+runs at build time — no GPU, no network — and is the kind of smoke test worth running right after
+`uv sync`:
+
+```{python}
+import sys
+import platform
+
+print("Python version :", platform.python_version())
+print("Platform       :", platform.system(), platform.machine())
+
+# A trivial computation that must succeed if the interpreter works at all.
+assert sum(range(10)) == 45
+print("Sanity check   : OK")
+```
+
+The single most useful field, though, is **`sys.executable`** — the absolute path of the
+interpreter running this code. It's the giveaway for *which* Python you're actually on:
+
+```python
+>>> import sys; sys.executable
+'/home/user/ai-engineer/.venv/bin/python3'   # ← should sit inside your project's .venv
+```
+
+It should point *inside* your project's `.venv`, not at the system Python (e.g.
+`/usr/bin/python3`). If it doesn't, your shell — or your notebook kernel — isn't using the
+environment you think it is.
+
+## Key takeaways
+
+- A **virtual environment** isolates each project's interpreter and packages, killing cross-project
+  version clashes and the "works on my machine" bug.
+- Reproducibility = isolation **+ pinning**; risk compounds across dependencies, so a committed
+  **lockfile** (`uv.lock`) is what makes a fresh `uv sync` reproduce your setup exactly.
+- **`uv` is the daily driver**: `uv add` to change deps, `uv run` to execute inside the env. Use
+  conda when you need native/system binaries; pip+venv is the stdlib baseline underneath it all.
+- A Jupyter **kernel** is just a Python process — point it at your project `.venv`, and check
+  `sys.executable` when imports mysteriously fail.
+
+## Check your understanding
+
+**1.** What exactly does a virtual environment isolate, and what concrete problem does that isolation
+solve?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+It isolates the **interpreter** and the **`site-packages`** (installed packages) for one project.
+That lets two projects depend on conflicting versions (e.g. `numpy 1.26` vs `2.1`) without
+interfering, which prevents the "installing for project A broke project B / it only works on my
+machine" class of bug.
+:::
+
+**2.** What's the difference between `pyproject.toml` and `uv.lock`, and which one actually guarantees
+that two machines get the same packages?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+`pyproject.toml` declares the dependencies you *want*, often with loose ranges (e.g. `numpy>=1.26`).
+`uv.lock` records the **exact resolved version of every package and transitive dependency**. The
+**lockfile** is what guarantees reproducibility — `uv sync` installs precisely what it pins, so a
+fresh machine gets a byte-identical set.
+:::
+
+**3.** Why does an environment get *less* likely to reproduce cleanly as you add more loosely-pinned
+dependencies?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+Each unpinned dependency carries an independent chance of resolving to a different, possibly
+breaking version. Those chances multiply: $P_\text{reproduce} = \prod_i (1 - p_i)$. Even tiny
+per-package risk compounds across dozens of packages (e.g. $0.99^{50} \approx 0.61$), so more
+unpinned deps means a higher overall chance something drifts. Pinning via a lockfile drives each
+$p_i$ toward zero.
+:::
+
+**4.** In Jupyter, what is a "kernel," and how should it relate to your project's virtual environment?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+A kernel is the separate **Python process** that actually executes a notebook's cells. It should be
+the interpreter from your project's `.venv`, so that imports resolve to the packages you installed
+for that project. A mismatched kernel is the usual cause of "I installed it but the import fails."
+Launching with `uv run jupyter lab` (or selecting the `.venv` interpreter in VS Code) ensures the
+right kernel.
+:::
+
+**5.** You need a package that bundles a CUDA toolkit and some compiled native libraries as prebuilt
+binaries. Would you reach for `uv` or conda, and why?
+
+::: {.callout-tip title="Show answer" collapse="true"}
+**conda (or mamba).** Its strength is shipping **non-Python / system-level binaries** (CUDA, MKL,
+compilers, GDAL) as prebuilt packages, which is awkward with pip/uv. For pure-Python stacks, `uv`
+is simpler and faster — but when native dependencies fight you, conda is the right tool.
+:::
+
+## Coding tasks
+
+Work these in the paired notebook — open it in Colab (no GPU needed for Day 2):
+
+### Task 1 — Environment self-check
+
+Write a function `env_report()` that prints the running Python version (use `sys.version_info`) and
+the platform, and then **asserts** that Python is at least **3.10** (raise a clear error otherwise).
+Call it to confirm your interpreter is the one you expect.
+
+{{< colab notebooks/01-foundations/02-environment-setup.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+import sys
+import platform
+
+def env_report():
+    v = sys.version_info
+    print(f"Python  : {v.major}.{v.minor}.{v.micro}")
+    print(f"Platform: {platform.system()} {platform.machine()}")
+    assert v >= (3, 10), f"Need Python >= 3.10, got {v.major}.{v.minor}"
+    print("Interpreter OK ✅")
+
+env_report()
+```
+:::
+
+### Task 2 — Confirm a package is installed and working
+
+A real "does my env work?" test imports a third-party package and *uses* it. Write
+`check_numpy()` that imports `numpy`, prints its version (`numpy.__version__`), builds the array
+`[1, 2, 3]`, and asserts its sum equals `6`. If the import fails, print a helpful message telling the
+reader to run `uv add numpy` (or `pip install numpy`).
+
+{{< colab notebooks/01-foundations/02-environment-setup.ipynb >}}
+
+::: {.callout-tip title="Show solution" collapse="true"}
+```python
+def check_numpy():
+    try:
+        import numpy as np
+    except ImportError:
+        print("numpy is not installed — run `uv add numpy` (or `pip install numpy`).")
+        return
+    print(f"numpy   : {np.__version__}")
+    a = np.array([1, 2, 3])
+    assert a.sum() == 6
+    print("numpy works ✅")
+
+check_numpy()
+```
+:::
+
+## References & further reading
+
+- [uv — official documentation](https://docs.astral.sh/uv/)
+- [Python `venv` — standard library docs](https://docs.python.org/3/library/venv.html)
+- [Project Jupyter — documentation](https://docs.jupyter.org/en/latest/)
+- [VS Code — Python environments](https://code.visualstudio.com/docs/python/environments)
+
+## Further references and details
+
+External resources to go deeper than this 30-minute tour allows. Each note says *what* it adds and
+*why* it's worth your time.
+
+- **[uv documentation — "Working on projects"](https://docs.astral.sh/uv/guides/projects/)** — the
+  canonical walkthrough of `uv init` / `uv add` / `uv sync` / `uv run`; read it once and the daily
+  workflow becomes muscle memory.
+- **[Astral — "uv: Python packaging in Rust"](https://astral.sh/blog/uv)** — the launch post
+  explaining *why* uv exists and how it unifies pip, virtualenv, pip-tools, and more; good context
+  for what it replaces.
+- **[An unbiased evaluation of environment management and packaging tools](https://alpopkes.com/posts/python/packaging_tools/)**
+  — a clear comparison of pip+venv, conda, Poetry, uv and friends, so you understand the landscape
+  rather than cargo-culting one tool.
+- **[Real Python — "Jupyter Notebook: an introduction"](https://realpython.com/jupyter-notebook-introduction/)**
+  — a friendly, deeper tour of notebooks, kernels, and the cell-based workflow you'll use every day
+  in this course.
