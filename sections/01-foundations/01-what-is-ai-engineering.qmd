@@ -1,5 +1,5 @@
 ---
-title: "What is AI engineering?"
+title: "Day 1 — What is AI engineering?"
 day: 1
 course-section: "01 · Foundations & Setup"
 est-time: "30 min"

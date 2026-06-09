@@ -27,7 +27,7 @@ website:
     style: floating
     collapse-level: 1
     contents:
-      - section: "What is AI engineering?"
+      - section: "01 · Foundations & Setup"
         contents: sections/01-foundations/*.qmd
       - section: "02 · Math & Data Essentials"
         contents: sections/02-math-data/*.qmd
