@@ -3,7 +3,7 @@ title: "Day 2 — Setting Up Your AI Engineering Environment"
 day: 2
 course-section: "01 · Foundations & Setup"
 est-time: "30 min"
-status: draft
+status: reviewed
 objectives:
   - "Explain why isolated, reproducible Python environments matter (the 'works on my machine' problem)"
   - "Create and manage a project environment with uv (pyproject.toml, uv.lock, uv sync/run)"
@@ -14,10 +14,6 @@ prerequisites:
   - "Day 1 — What is AI engineering?"
 notebook: notebooks/01-foundations/02-environment-setup.ipynb
 ---
-
-```{=html}
-<div class="draft-banner">🚧 <strong>Draft</strong> — under human review, content may change.</div>
-```
 
 ::: {.tutorial-meta}
 Day 2 · 01 · Foundations & Setup · ⏱️ ~30 min
